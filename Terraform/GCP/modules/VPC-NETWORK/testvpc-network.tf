@@ -17,12 +17,12 @@ module "vpc-network" {
     (var.subnetwork) = [
       {
         range_name    = var.ip_range_pods_name
-        //ip_cidr_range = "192.*.*.*/18"
+        //ip_cidr_range = "192.X.X.X/18"
         ip_cidr_range = var.ip_cidr_range
       },
       {
         range_name    = var.ip_range_services_name
-        //ip_cidr_range = "192.*.*.*/18"
+        //ip_cidr_range = "192.X.X.X/18"
         ip_cidr_range = var.ip_cidr_range_service
       },
     ]

@@ -42,8 +42,8 @@ resource "aws_eks_node_group" "eks-node-group" {
   cluster_name    = aws_eks_cluster.eks-cluster.name
   node_group_name = "${var.env}-eks-node"
   node_role_arn   = aws_iam_role.eks-node-group-role.arn
-  subnet_ids      = [module.vpc.private_subnets[0]]
-  #subnet_ids      = [module.vpc.private_subnets[0],module.vpc.private_subnets[1]]
+  subnet_ids      = [var.vpc.private_subnets[0]]
+  #subnet_ids      = [vpc-module.VPC.private_subnets[0],vpc-module.VPC.private_subnets[1]]
   instance_types  = [var.node_group_instance_type]
   disk_size       = var.node_group_disk_size
   /* # release_version = var.node_group_ami_release_version */ 
@@ -51,13 +51,6 @@ resource "aws_eks_node_group" "eks-node-group" {
     desired_size = var.node_group_desired_capacity
     max_size     = var.node_group_max_capacity
     min_size     = var.node_group_min_capacity
-  }
-  
-  // Dont accept ami ID
-  //ami_type                  = var.node_group_2_ami_type
-   remote_access {
-    ec2_ssh_key               = var.bastion_key_name
-    source_security_group_ids = ["${module.sg-bastion-ssh.this_security_group_id}",aws_eks_cluster.eks-cluster.vpc_config[0].cluster_security_group_id]
   }
 
   depends_on = [

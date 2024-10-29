@@ -1,11 +1,5 @@
 #### Environment Specific Variable####
 
-variable "create_individual_node_group" {
-  description = "Decide if Node Group  to be created or not TRUE=Create FALSE=Dont create"
-  type        = bool
-  default     = false
-}
-
 variable "engine_version" {
   description = "The engine version to use"
   type        = string
@@ -70,7 +64,7 @@ variable "create_rds_instance" {
 variable "env" {
   description = "The environment name"
   type        = string
-  default     = ""
+  default     = "uat"
 }
 
 variable "environment" {
@@ -91,7 +85,7 @@ variable "label_env" {
 variable "created_on" {
   description = "creation date"
   type        = string
-  default     = "2021-01-14"
+  default     = "2024-10-23"
 }
 #### VPC variables ####
 variable "vpc_cidr" {
@@ -485,4 +479,17 @@ variable "eks_cluster_name" {
   type = string
   description = "EKS 1.23 cluster name"
 }
+
+variable "vpc" {
+  type = object({
+    private_subnets = list(string)
+    public_subnets  = list(string)
+  })
+}
+
+
+variable "subnet_ids" {
+  type = list(string)
+}
+
 

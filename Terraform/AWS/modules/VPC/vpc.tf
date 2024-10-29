@@ -1,9 +1,8 @@
 
 ################################ VPC ##########################################
 
-module "vpc" {
+module "VPC" {
   source                       = "terraform-aws-modules/vpc/aws"
-  version                      = "2.50.0"
   name                         = "${var.env}-vpc"
   cidr                         = var.vpc_cidr
   azs                          = var.azs
@@ -28,12 +27,12 @@ module "vpc" {
     "kubernetes.io/cluster/${var.env}-eks-cluster" = "shared"
   }
 
-  enable_flow_log           = true
-  flow_log_destination_type = "s3"
-  flow_log_destination_arn  = module.s3-bucket-VPC-Flow-logs.this_s3_bucket_arn 
+  enable_flow_log           = false
+  #flow_log_destination_type = "s3"
+  #flow_log_destination_arn  = module.s3-bucket-VPC-Flow-logs.this_s3_bucket_arn 
 
-  vpc_flow_log_tags = {
+  /* vpc_flow_log_tags = {
     Name = "vpc-flow-logs-s3-bucket"
-  }
+  } */
 
 }

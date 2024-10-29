@@ -1,13 +1,12 @@
 #######################*******RDS MAIN******###################################
 module "rds-sql" {
   source                    = "terraform-aws-modules/rds/aws"
-  version                   = "2.18.0"
+  version = "6.6.0"
   identifier                = "${var.env}-db"
   instance_class            = var.rds_instance_class
   username                  = var.rds_username
   password                  = var.rds_password
   port                      = var.rds_port
-  vpc_security_group_ids    = [module.sg-mysql.this_security_group_id,module.sg-mysql-cdp.this_security_group_id]
   
   engine                    = var.engine
   allocated_storage         = var.allocated_storage
@@ -19,8 +18,8 @@ module "rds-sql" {
 # Backups are required in order to create a replica
   backup_retention_period   = var.rds_backup_retention_period
 # DB subnet group
-  subnet_ids                = [module.vpc.private_subnets[0],module.vpc.private_subnets[1]]
-  #subnet_ids                = [module.vpc.private_subnets[0],module.vpc.private_subnets[1],module.vpc.private_subnets[2]]
+  subnet_ids                = var.subnet_ids
+  #subnet_ids                = [var.vpc.private_subnets[0],var.vpc.private_subnets[1],var.vpc.private_subnets[2]]
   tags = {
      name         = "${var.env}-db-instance"
      environment  = var.env
@@ -30,7 +29,7 @@ module "rds-sql" {
   create_db_option_group    = false
   create_db_parameter_group = false
 
-  name     = "trial"
+  #name     = "trial"
 
   storage_type              = var.rds_storage_type
   max_allocated_storage     = var.rds_max_allocated_storage
@@ -56,6 +55,7 @@ module "rds-sql" {
 
 module "rds-replica" {
   source                    = "terraform-aws-modules/rds/aws"
+  version = "6.6.0"
   identifier                = "${var.env}-db-replica"
   engine_version            = var.engine_version
   backup_window             = var.backup_window
@@ -65,11 +65,10 @@ module "rds-replica" {
   maintenance_window        = var.maintenance_window
   allocated_storage         = var.allocated_storage
   # Source database. For cross-region use this_db_instance_arn
-  replicate_source_db       = module.rds-sql.this_db_instance_id
+  replicate_source_db       = module.rds-sql.db_instance_name
   max_allocated_storage     = var.rds_max_allocated_storage
   username                  = var.rds_username
   password                  = var.rds_password
-  vpc_security_group_ids    = [module.sg-mysql.this_security_group_id]
   availability_zone         = "ap-south-1a"
   # disable backups to create DB faster
   backup_retention_period = 0
@@ -84,16 +83,14 @@ module "rds-replica" {
     "created by" = "terraform"
     "created on" = "${var.created_on}"
   }
-
-  version                   = "2.18.0"
-
   #final_snapshot_identifier = "${var.env}-db-replica-final-snapshot"
   #skip_final_snapshot       = var.rds_replica_skip_final_snapshot
   apply_immediately         = true
-  #subnet_ids                = module.vpc.private_subnets
+  #subnet_ids                = var.vpc.private_subnets
 
   deletion_protection       = var.rds_deletion_protection
   #Conditional creation
      #Disable creation of RDS instance(s)
   create_db_instance = var.create_rds_replica
 }
+

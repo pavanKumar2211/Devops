@@ -54,7 +54,7 @@ resource "aws_iam_role_policy_attachment" "eks-cluster-AmazonEKS_CNI_Policy" {
 }
 
 # EKS Control Plane security group
-resource "aws_security_group_rule" "alb-cluster-security-group-rule" {
+/* resource "aws_security_group_rule" "alb-cluster-security-group-rule" {
   from_port                = 30000
   protocol                 = "tcp"
   security_group_id        = aws_eks_cluster.eks-cluster.vpc_config.0.cluster_security_group_id
@@ -72,9 +72,9 @@ resource "aws_security_group_rule" "secure-alb-cluster-security-group-rule" {
   to_port                  = 32767
   type                     = "ingress"
   depends_on = [aws_eks_cluster.eks-cluster]
-}
+} */
 
-resource "aws_security_group_rule" "alb-cluster-security-group-rule-for-bastion" {
+/* resource "aws_security_group_rule" "alb-cluster-security-group-rule-for-bastion" {
   from_port   = 0
   protocol                 = "-1"
   security_group_id       = aws_eks_cluster.eks-cluster.vpc_config.0.cluster_security_group_id
@@ -82,19 +82,18 @@ resource "aws_security_group_rule" "alb-cluster-security-group-rule-for-bastion"
   to_port                  = 0
   type                     = "ingress"
   depends_on = [aws_eks_cluster.eks-cluster]
-}
+} */
 
-resource "aws_security_group_rule" "alb-cluster-security-group-rule-for-access-by-bastion" {
+/* resource "aws_security_group_rule" "alb-cluster-security-group-rule-for-access-by-bastion" {
   from_port   = 0
   protocol                 = "-1"
   security_group_id       = aws_eks_cluster.eks-cluster.vpc_config.0.cluster_security_group_id
-  source_security_group_id = "${module.sg-bastion-ssh.this_security_group_id}"
   to_port                  = 0
   type                     = "ingress"
   depends_on = [aws_eks_cluster.eks-cluster]
-}
+} */
 
-resource "aws_security_group_rule" "alb-cluster-security-group-rule-for-kafka" {
+/* resource "aws_security_group_rule" "alb-cluster-security-group-rule-for-kafka" {
   from_port   = 0
   protocol                 = "-1"
   security_group_id        = aws_eks_cluster.eks-cluster.vpc_config.0.cluster_security_group_id
@@ -102,7 +101,7 @@ resource "aws_security_group_rule" "alb-cluster-security-group-rule-for-kafka" {
   to_port                  = 0
   type                     = "ingress"
   depends_on = [aws_eks_cluster.eks-cluster]
-}
+} */
 
 
 resource "aws_eks_cluster" "eks-cluster" {
@@ -112,7 +111,7 @@ resource "aws_eks_cluster" "eks-cluster" {
   version = var.eks_cluster_version
   
   vpc_config {
-    subnet_ids         = module.vpc.private_subnets
+    subnet_ids         = var.vpc.private_subnets
     endpoint_private_access = true  
   }
 
@@ -130,3 +129,4 @@ resource "aws_eks_cluster" "eks-cluster" {
     "created on" = "${var.creation_date}"
   }
 }
+

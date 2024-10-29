@@ -46,5 +46,27 @@ variable "bastion_private_ip" {
   default     = "default"
 }
 
+variable "env" {
+  description = "The environment name"
+  type        = string
+
+}
+
+####created_on
+variable "created_on" {
+  description = "creation date"
+  type        = string
+}
+
+/* variable "vpc" {
+  type = object({
+    azs = list(string)
+    public_subnets = list(string)
+  })
+} */
+
+variable "subnet_ids" {
+  type = list(string)
+}
 
 

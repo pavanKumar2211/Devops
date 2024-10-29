@@ -145,3 +145,20 @@ variable "engine_version" {
   type        = string
 
 }
+
+variable "env" {
+  description = "The environment name"
+  type        = string
+
+}
+
+####created_on
+variable "created_on" {
+  description = "creation date"
+  type        = string
+
+}
+
+variable "subnet_ids" {
+  type = list(string)
+}

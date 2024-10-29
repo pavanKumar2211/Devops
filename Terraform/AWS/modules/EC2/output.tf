@@ -26,6 +26,4 @@ output "bastion_host_public_ip" {
   value = module.ec2-bastion.public_ip
 }
 
-output "bastion_host_security_group" {
-  value = module.ec2-bastion.security_groups
-}
+

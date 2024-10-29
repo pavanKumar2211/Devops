@@ -36,11 +36,9 @@ module "ec2-bastion" {
   version                     = "2.15.0"
   name                        = "${var.env}-bastion-host"
   ami                         = var.bastion_ami
-  //associate_public_ip_address = var.bastion_associate_public_ip_address
   instance_type               = var.bastion_instance_type
   tenancy                     = var.bastion_tenancy
-  vpc_security_group_ids      = [module.sg-bastion-ssh.this_security_group_id]
-  subnet_ids                  = module.vpc.public_subnets
+  subnet_ids                  = var.subnet_ids
   key_name                    = var.bastion_key_name
   monitoring                  = var.bastion_instance_monitoring
   ebs_optimized               = var.bastion_instance_ebs_optimized

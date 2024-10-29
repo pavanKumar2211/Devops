@@ -46,7 +46,16 @@ variable "create_database_subnet_group" {
   default     = true
 }
 
-variable "create_individual_node_group" {
-  description = "Decide if Node Group  to be created or not TRUE=Create FALE=Dont create"
-  type        = bool
+
+variable "env" {
+  description = "The environment name"
+  type        = string
+
+}
+
+####created_on
+variable "created_on" {
+  description = "creation date"
+  type        = string
+
 }

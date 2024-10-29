@@ -68,3 +68,23 @@ variable "eks_cluster_name" {
   description = "EKS 1.29 cluster name"
   default = "feature-env"
 }
+
+variable "env" {
+  description = "The environment name"
+  type        = string
+
+}
+
+####created_on
+variable "created_on" {
+  description = "creation date"
+  type        = string
+
+}
+
+variable "vpc" {
+  type = object({
+    private_subnets = list(string)
+    public_subnets  = list(string)
+  })
+}

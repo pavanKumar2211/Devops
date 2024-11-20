@@ -5,11 +5,9 @@ provider "aws" {
 }
 
 terraform {  
-  backend "s3" {
-    bucket = "stateterraform-bucket"
-    key    = "state_dir/terraform.tfstate"
-    region = "ap-south-1"
-  }
+  backend "local" {
+    key    = "./terraform.tfstate"
+}
 }
 
 module "vpc-module" {

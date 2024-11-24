@@ -1,8 +1,8 @@
-provider "aws" {
-  region      = "ap-south-1"
-  access_key  = ""
-  secret_key  = ""
+provider "aws" {          #aws configure --profile my-profile
+  profile = "my-profile"
+  region  = "ap-south-1"
 }
+
 
 terraform {  
   backend "local" {

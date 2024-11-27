@@ -84,7 +84,7 @@ pipeline {
 
                             source $WORKSPACE/tagname.ini
                             source $WORKSPACE/imagesg.ini
-                            helm upgrade --install ${HELM_CHART} -f $WORKSPACE/env-configs/environment-values/${DEPLOYMENT_ENV}/${HELM_CHART}.yaml --set image.tagsg2=$TAG_NAME  $WORKSPACE/${HELM_CHART}
+                            helm upgrade --install ${HELM_CHART} -f $WORKSPACE/env-configs/environment-values/${DEPLOYMENT_ENV}/${HELM_CHART}.yaml --set image.tag=$TAG_NAME  $WORKSPACE/${HELM_CHART}
                             '''
                         
                     }

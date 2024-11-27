@@ -1,7 +1,7 @@
 
 
  module "vpc-network" {
-    source                 = "../../modules/VPC-NETWORK"
+    source                 = "./modules/VPC-NETWORK"
     project_id             = var.project_id
     network                = var.network
     subnetwork             = var.subnetwork
@@ -40,7 +40,7 @@
 } */
  
  module "cloud-nat" {
-	source              =  "../../modules/CLOUD-NAT"
+	source              =  "./modules/CLOUD-NAT"
         project_id          =  var.project_id
         network             =  var.network
         region              =  var.region
@@ -54,7 +54,7 @@
 } */
 
 module "mysql_db" {
-        source                      = "../../modules/MYSQL"
+        source                      = "./modules/MYSQL"
         db_name                     =  var.db_name
         database_version            =  var.database_version	
         project_id	            =  var.project_id

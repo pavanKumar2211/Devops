@@ -1,0 +1,110 @@
+pipeline {
+    environment {
+        DOCKER_REPOSITORY_URI = "${ECR_REPOSITORY_URL}/${HELM_CHART}"
+        registryCredentialId = 'ecr:ap-south-1:ecr-cred'
+    }
+
+    agent {
+        label "${agent}"
+    }
+
+    stages {
+       stage('Cloning Git Repo') {
+            steps {
+
+                git branch: '${BRANCH}', credentialsId: 'devops-gitlab-ssh' , url: '$GRADLE_REPO_URL'
+
+                sh """
+                VERSION=`grep "version =" build.gradle | awk '{print \$3}'| tr -d \'\'`
+                eval echo "VERSION=\$VERSION" > version.ini
+                """          
+            }
+        }
+
+        stage ('Build & Analysis'){
+            steps {
+
+               sh '''
+                 chmod +x gradlew
+                ./gradlew clean build $GRADLE_PARAMS
+
+               '''
+            }
+        }
+
+
+
+        stage('Build & push Docker image') {
+            steps {
+                withDockerRegistry(credentialsId: 'ecr:ap-south-1:ecr-cred', url: '$ECR_REPOSITORY_URL') {
+
+                    sh '''
+
+                            source version.ini
+                            echo $VERSION
+                            GIT_COMMIT_ID="\$(echo \$(git rev-parse HEAD) | cut -c 1-7)"
+                            TIMESTAMP=\$(date +'%Y%m%d.%H%M')
+                            export TAG_NAME=v-\$VERSION-\$TIMESTAMP-\$GIT_COMMIT_ID
+                            export TAG=v-\$VERSION
+                            IMG_NAME="\$DOCKER_REPOSITORY_URI:\$TAG_NAME"
+                            IMAGE="\$DOCKER_REPOSITORY_URI:\$TAG"
+                            IMAGE_LATEST="\$DOCKER_REPOSITORY_URI:latest"
+                            docker build -t "\$IMG_NAME" -f ../../Docker/gradleagent.Dockerfile
+                            docker tag \$IMG_NAME \$IMAGE
+                            docker tag \$IMG_NAME \$IMAGE_LATEST           
+                            docker push "\$IMG_NAME"
+                            docker push "\$IMAGE"
+                            docker push "\$IMAGE_LATEST"
+                            echo "TAG_NAME=\$TAG_NAME" > tagname.ini
+                            docker rmi -f \$IMG_NAME
+                            docker rmi -f \$IMAGE
+                            docker rmi -f \$IMAGE_LATEST
+
+                    '''
+
+
+                }
+            }
+        }
+
+        stage('Deployment to eks-cluster') {
+            steps {
+                script {
+                dir('env-configs') {
+
+                        git branch: '${DEVOPS_BRANCH}', credentialsId: 'devops-gitlab-ssh' , url: '${ENV_FILES_REPO_URL}'
+                }
+                    withCredentials([file(credentialsId: "${KUBE_ENV}", variable: 'KUBECONFIG')]) {
+                        sh '''
+                        IMAGE=$(kubectl get deploy -o=custom-columns=NAME:.metadata.name,IMAGE:.spec.template.spec.containers[*].image -n $DEPLOYMENT_ENV | cut -d ':' -f1,2 | awk -F  ":" '/1/ {print $1,$2}' | awk '{print $1,$3}' | grep ${HELM_CHART}-${DEPLOYMENT_ENV} | cut -d' ' -f2-)
+                        echo "IMAGE=\$IMAGE" > imagesg.ini
+                        '''
+                      
+                            sh '''
+
+                            source $WORKSPACE/tagname.ini
+                            source $WORKSPACE/imagesg.ini
+                            helm upgrade --install ${HELM_CHART} -f $WORKSPACE/env-configs/environment-values/${DEPLOYMENT_ENV}/${HELM_CHART}.yaml --set image.tag=$TAG_NAME  $WORKSPACE/${HELM_CHART}
+                            '''
+                        
+                    }
+                }
+            }
+        }
+    }
+
+        post {
+            always {
+			emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+			mimeType: 'text/html',
+			subject: "Jenkins Build ${currentBuild.currentResult} ${currentBuild.fullDisplayName}",
+			from: "<EMAIL>",
+			replyTo: "<EMAIL>",
+			to: "$TO_LIST",
+			recipientProviders: [
+			   [$class: 'RequesterRecipientProvider'],
+               [$class: 'CulpritsRecipientProvider'],
+               [$class: 'DevelopersRecipientProvider']]
+		    }
+        }
+}

@@ -1,19 +1,10 @@
-provider "aws" {
-  region      = "ap-south-1"
-  access_key  = ""
-  secret_key  = ""
-}
-
-terraform {  
-  backend "s3" {
-    bucket = "stateterraform-bucket"
-    key    = "state_dir/terraform.tfstate"
-    region = "us-east-1"
-  }
+provider "aws" {          #aws configure --profile my-profile
+  profile = "my-profile"
+  region  = "ap-south-1"
 }
 
 module "vpc-module" {
-  source = "../../modules/VPC"
+  source = "./modules/VPC"
   created_on   = var.created_on
   env    = var.env
   enable_nat_gateway                  = var.enable_nat_gateway
@@ -28,7 +19,7 @@ module "vpc-module" {
 }
 
 module "rds-module" {
-  source = "../../modules/RDS"
+  source = "./modules/RDS"
   env    = var.env
   created_on   = var.created_on
   subnet_ids   = var.subnet_ids
@@ -60,7 +51,7 @@ module "rds-module" {
 }
 
 module "eks-module" {
-  source = "../../modules/EKS_CLUSTER"
+  source = "./modules/EKS_CLUSTER"
   environment  = var.environment
   env          = var.env
   vpc           = var.vpc
@@ -75,7 +66,7 @@ module "eks-module" {
 }
 
 module "ec2-module" {
-  source = "../../modules/EC2"
+  source = "./modules/EC2"
   env    = var.env
   #label_env    = var.label_env
   created_on    = var.created_on

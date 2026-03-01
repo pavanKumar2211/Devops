@@ -8,3 +8,9 @@ Welcome to Devops repository.
    - AWS 
    - GCP
 
+### CICD:
+   - Azure-pipeline
+   - Jenkins
+
+### Docker
+   - Dockerfile
